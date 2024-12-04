@@ -17,7 +17,12 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
+
+-----------------------------------------
+-- Custom Widgets
+-----------------------------------------
 local volume_widget = require("my-widgets.volume_widget")
+local battery_widget = require("my-widgets.battery_widget")
 
 os.setlocale("pt_BR.UTF-8")
 
@@ -69,6 +74,7 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     -- awful.layout.suit.floating,
+    awful.layout.suit.max,
     awful.layout.suit.tile,
     -- awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
@@ -77,7 +83,7 @@ awful.layout.layouts = {
     -- awful.layout.suit.fair.horizontal,
     -- awful.layout.suit.spiral,
     -- awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
+    -- awful.layout.suit.max,
     -- awful.layout.suit.max.fullscreen,
     -- awful.layout.suit.magnifier,
     awful.layout.suit.corner.nw,
@@ -278,6 +284,12 @@ awful.screen.connect_for_each_screen(function(s)
                         layout = wibox.container.margin
                     },
                     mytextclock,
+                    {
+                        battery_widget,
+                        left = 8,
+                        right = 8,
+                        layout = wibox.container.margin
+                    },
                     volume_widget.widget,
                     {
                         s.mylayoutbox,
@@ -366,10 +378,8 @@ globalkeys = gears.table.join(
         { description = "increase the number of columns", group = "layout" }),
     awful.key({ modkey, "Control" }, "l", function() awful.tag.incncol(-1, nil, true) end,
         { description = "decrease the number of columns", group = "layout" }),
-    awful.key({ modkey, }, "space", function() awful.layout.inc(1) end,
+    awful.key({ modkey, }, "o", function() awful.layout.inc(1) end,
         { description = "select next", group = "layout" }),
-    awful.key({ modkey, "Shift" }, "space", function() awful.layout.inc(-1) end,
-        { description = "select previous", group = "layout" }),
 
     awful.key({ modkey, "Control" }, "n",
         function()
@@ -409,9 +419,15 @@ globalkeys = gears.table.join(
     awful.key({}, "XF86AudioMute", function()
         volume_widget.toggle_mute()
     end, { description = "toggle mute", group = "media" }),
-    awful.key({ modkey }, "u", function()
-        awful.spawn("rofi -show drun")
-    end, { description = "rofi", group = "launcher" })
+    awful.key({ modkey }, "space", function()
+        awful.spawn.with_shell("~/.config/rofi/bin/launcher")
+    end, { description = "rofi", group = "launcher" }),
+    awful.key({ modkey, "Shift" }, "f", function()
+        awful.spawn("thunar")
+    end, { description = "File manager", group = "launcher" }),
+    awful.key({ modkey, "Shift" }, "c", function()
+        awful.spawn("firefox")
+    end, { description = "firefox", group = "launcher" })
 )
 
 clientkeys = gears.table.join(
@@ -427,8 +443,6 @@ clientkeys = gears.table.join(
         { description = "toggle floating", group = "client" }),
     awful.key({ modkey, "Control" }, "Return", function(c) c:swap(awful.client.getmaster()) end,
         { description = "move to master", group = "client" }),
-    awful.key({ modkey, }, "o", function(c) c:move_to_screen() end,
-        { description = "move to screen", group = "client" }),
     awful.key({ modkey, }, "t", function(c) c.ontop = not c.ontop end,
         { description = "toggle keep on top", group = "client" }),
     awful.key({ modkey, }, "n",
@@ -665,3 +679,7 @@ end)
 
 -- App startup
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
+
+------------------------------------------
+-- Debugging
+------------------------------------------

@@ -2,6 +2,11 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local gears = require("gears")
+local lgi = require("lgi")
+local Gtk = lgi.require("Gtk", "3.0")
+
+-- Initialize GTK
+Gtk.init()
 
 local volume_widget = {}
 
@@ -15,8 +20,8 @@ local widget_content = wibox.widget {
                 image = "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-high.svg",
                 resize = true,                   -- Allow resizing
             },
-            forced_width = 16,                   -- Set desired width
-            forced_height = 16,                  -- Set desired height
+            forced_width = 14,                   -- Set desired width
+            forced_height = 14,                  -- Set desired height
             widget = wibox.container.constraint, -- Constrain size
         },
         widget = wibox.container.place,          -- Center the icon
@@ -33,6 +38,16 @@ local widget_content = wibox.widget {
     spacing = 5,
 }
 
+local function get_icon_path(icon_name, size)
+    local icon_theme = Gtk.IconTheme.get_default()
+    local icon_info = icon_theme:lookup_icon(icon_name, size, 0)
+    if icon_info then
+        return icon_info:get_filename()
+    else
+        return nil
+    end
+end
+
 -- Helper function to get the volume
 local function get_volume(callback)
     awful.spawn.easy_async_with_shell("amixer sget Master", function(stdout)
@@ -45,28 +60,25 @@ end
 -- Function to update the widget
 function volume_widget.update()
     get_volume(function(volume, status)
-        local icon_path
+        local icon_name
         if status == "off" then
-            icon_path = "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-muted.svg"
+            icon_name = "audio-volume-muted"
             widget_content:get_children_by_id("text")[1].markup = "<b>Muted</b>"
         else
             if volume == 0 then
-                icon_path =
-                "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-muted.svg"
+                icon_name = "audio-volume-muted"
             elseif volume <= 33 then
-                icon_path =
-                "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-low.svg"
+                icon_name = "audio-volume-low"
             elseif volume <= 66 then
-                icon_path =
-                "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-medium.svg"
+                icon_name = "audio-volume-medium"
             else
-                icon_path =
-                "/home/denisjulio/.local/share/icons/McMojave-circle-blue-dark/status/16/audio-volume-high.svg"
+                icon_name = "audio-volume-high"
             end
             widget_content:get_children_by_id("text")[1].markup = string.format("<b>%d%%</b>", volume)
         end
 
-        -- Update the icon
+        -- Resolve the icon path dynamically
+        local icon_path = get_icon_path(icon_name, 16) or "/path/to/fallback-icon.svg"
         widget_content:get_children_by_id("icon")[1].image = icon_path
     end)
 end
