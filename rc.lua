@@ -279,11 +279,10 @@ awful.screen.connect_for_each_screen(function(s)
                         wibox.widget.systray(),
                         left = 10,
                         right = 10,
-                        top = 5,
-                        bottom = 5,
+                        top = 6,
+                        bottom = 6,
                         layout = wibox.container.margin
                     },
-                    mytextclock,
                     {
                         battery_widget,
                         left = 8,
@@ -291,6 +290,7 @@ awful.screen.connect_for_each_screen(function(s)
                         layout = wibox.container.margin
                     },
                     volume_widget.widget,
+                    mytextclock,
                     {
                         s.mylayoutbox,
                         left = 10,
@@ -364,8 +364,10 @@ globalkeys = gears.table.join(
         { description = "open a terminal", group = "launcher" }),
     awful.key({ modkey, "Control" }, "r", awesome.restart,
         { description = "reload awesome", group = "awesome" }),
-    awful.key({ modkey, "Shift" }, "q", awesome.quit,
-        { description = "quit awesome", group = "awesome" }),
+    awful.key({ modkey, "Shift" }, "q", function()
+            awful.spawn.with_shell("~/.config/rofi/bin/powermenu")
+        end,
+        { description = "open power menu", group = "awesome" }),
     awful.key({ modkey, }, "l", function() awful.tag.incmwfact(0.05) end,
         { description = "increase master width factor", group = "layout" }),
     awful.key({ modkey, }, "h", function() awful.tag.incmwfact(-0.05) end,
@@ -427,7 +429,10 @@ globalkeys = gears.table.join(
     end, { description = "File manager", group = "launcher" }),
     awful.key({ modkey, "Shift" }, "c", function()
         awful.spawn("firefox")
-    end, { description = "firefox", group = "launcher" })
+    end, { description = "firefox", group = "launcher" }),
+    awful.key({ modkey, "Shift" }, "p", function()
+        awful.spawn("copyq toggle")
+    end, { description = "toggle copiq", group = "launcher" })
 )
 
 clientkeys = gears.table.join(
