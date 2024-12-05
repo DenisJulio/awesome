@@ -23,6 +23,7 @@ require("awful.hotkeys_popup.keys")
 -----------------------------------------
 local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
+local brightness_widget = require("my-widgets.brightness_widget")
 
 os.setlocale("pt_BR.UTF-8")
 
@@ -125,14 +126,9 @@ mykeyboardlayout = awful.widget.keyboardlayout()
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget {
-    {
-        wibox.widget.textclock("%d de %B, %A"),
-        top = 5,
-        bottom = 5,
-        widget = wibox.container.margin
-    },
-    left = 10,
-    right = 10,
+    wibox.widget.textclock("%d de %B, %A"),
+    top = 5,
+    bottom = 5,
     widget = wibox.container.margin
 }
 
@@ -274,21 +270,16 @@ awful.screen.connect_for_each_screen(function(s)
                 },
                 { -- Right widgets
                     layout = wibox.layout.fixed.horizontal,
+                    spacing = 7,
                     mykeyboardlayout,
                     {
                         wibox.widget.systray(),
-                        left = 10,
-                        right = 10,
                         top = 6,
                         bottom = 6,
                         layout = wibox.container.margin
                     },
-                    {
-                        battery_widget,
-                        left = 8,
-                        right = 8,
-                        layout = wibox.container.margin
-                    },
+                    battery_widget,
+                    brightness_widget,
                     volume_widget.widget,
                     mytextclock,
                     {
@@ -432,7 +423,14 @@ globalkeys = gears.table.join(
     end, { description = "firefox", group = "launcher" }),
     awful.key({ modkey, "Shift" }, "p", function()
         awful.spawn("copyq toggle")
-    end, { description = "toggle copiq", group = "launcher" })
+    end, { description = "toggle copiq", group = "launcher" }),
+    awful.key({}, "XF86MonBrightnessUp", function()
+        brightness_widget.increase_brightness()
+    end, { description = "increase brightness", group = "custom" }),
+
+    awful.key({}, "XF86MonBrightnessDown", function()
+        brightness_widget.decrease_brightness()
+    end, { description = "decrease brightness", group = "custom" })
 )
 
 clientkeys = gears.table.join(

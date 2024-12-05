@@ -18,7 +18,7 @@ local battery_text = wibox.widget {
 
 local battery_widget = wibox.widget {
     layout = wibox.layout.fixed.horizontal,
-    spacing = 4,
+    spacing = 1,
     {
         {
             battery_icon,
