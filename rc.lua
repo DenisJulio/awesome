@@ -211,6 +211,8 @@ awful.screen.connect_for_each_screen(function(s)
         buttons = taglist_buttons
     }
 
+
+
     -- Create a tasklist widget
     s.mytasklist = awful.widget.tasklist {
         screen          = s,
@@ -236,6 +238,13 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s, height = 33, bg = "#00000000" })
+
+    -------------------------
+    --- Dock
+    s.dock = require("my-widgets.dock")
+    s.dock.screen = s
+
+    ---
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -356,7 +365,7 @@ globalkeys = gears.table.join(
     awful.key({ modkey, "Control" }, "r", awesome.restart,
         { description = "reload awesome", group = "awesome" }),
     awful.key({ modkey, "Shift" }, "q", function()
-            awful.spawn.with_shell("~/.config/rofi/bin/powermenu")
+            awful.spawn.with_shell("~/.config/rofi/powermenu/type-2/powermenu.sh")
         end,
         { description = "open power menu", group = "awesome" }),
     awful.key({ modkey, }, "l", function() awful.tag.incmwfact(0.05) end,
@@ -413,7 +422,7 @@ globalkeys = gears.table.join(
         volume_widget.toggle_mute()
     end, { description = "toggle mute", group = "media" }),
     awful.key({ modkey }, "space", function()
-        awful.spawn.with_shell("~/.config/rofi/bin/launcher")
+        awful.spawn.with_shell("~/.config/rofi/launchers/type-1/launcher.sh")
     end, { description = "rofi", group = "launcher" }),
     awful.key({ modkey, "Shift" }, "f", function()
         awful.spawn("thunar")
