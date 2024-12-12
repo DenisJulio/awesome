@@ -6,6 +6,7 @@
 local colors                                    = {
     sky = "#89dceb",
     base = "#24273a",
+    surface = "#1e1e2e",
     crust = "#11111b"
 }
 ---
@@ -65,6 +66,13 @@ theme.taglist_squares_unsel                     = theme_assets.taglist_squares_u
 -- notification_[bg|fg]
 -- notification_[width|height|margin]
 -- notification_[border_color|border_width|shape|opacity]
+theme.notification_width                        = 400
+theme.notification_height                       = 100
+theme.notification_max_width                    = 400
+theme.notification_icon_size                    = 80
+theme.notification_bg                           = colors.surface
+theme.notification_border_width                 = 2
+theme.notification_border_color                 = colors.sky
 
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
