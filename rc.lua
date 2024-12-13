@@ -184,6 +184,19 @@ local function set_wallpaper(s)
     end
 end
 
+local rootAppsDir = "/usr/share/applications/"
+local appsDir = "/home/denisjulio/.local/share/applications/"
+local dekstopFilePaths = {
+    appsDir .. "google-drive-pwa.desktop",
+    rootAppsDir .. "firefox.desktop",
+    appsDir .. "excalidraw-pwa.desktop",
+    rootAppsDir .. "obsidian.desktop",
+    rootAppsDir .. "thunar.desktop",
+    rootAppsDir .. "google-chrome.desktop",
+    rootAppsDir .. "org.mozilla.Thunderbird.desktop",
+    rootAppsDir .. "tor-browser.desktop",
+}
+
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
@@ -239,10 +252,9 @@ awful.screen.connect_for_each_screen(function(s)
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s, height = 33, bg = "#00000000" })
 
-    -------------------------
-    --- Dock
-    s.dock = require("my-widgets.dock")
-    s.dock.screen = s
+    -- Dock
+    Dock = require("my-widgets.dock")
+    s.dock = Dock:new({ desktopFilePaths = dekstopFilePaths })
 
     ---
 
