@@ -24,6 +24,12 @@ require("awful.hotkeys_popup.keys")
 local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
 local brightness_widget = require("my-widgets.brightness_widget")
+local Colors = require("utils.colors")
+
+naughty.config.presets.normal.timeout = 10
+naughty.config.presets.critical.timeout = 15
+naughty.config.presets.critical.border_color = Colors.red
+naughty.config.presets.critical.bg = Colors.surface
 
 os.setlocale("pt_BR.UTF-8")
 
