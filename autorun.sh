@@ -14,3 +14,4 @@ run "qbittorrent"
 run "copyq"
 run "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 run "syncthingtray"
+run "numlockx" on
