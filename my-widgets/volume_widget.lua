@@ -84,15 +84,17 @@ function volume_widget.update()
 end
 
 -- Function to increase volume
-function volume_widget.increase()
+function volume_widget.increase(callback)
     awful.spawn("amixer sset Master 5%+")
     volume_widget.update()
+    get_volume(callback)
 end
 
 -- Function to decrease volume
-function volume_widget.decrease()
+function volume_widget.decrease(callback)
     awful.spawn("amixer sset Master 5%-")
     volume_widget.update()
+    get_volume(callback)
 end
 
 -- Function to toggle mute

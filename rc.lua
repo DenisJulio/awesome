@@ -25,6 +25,12 @@ local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
 local brightness_widget = require("my-widgets.brightness_widget")
 local Colors = require("utils.colors")
+local volume_popup_mod = require("my-widgets.volume_popup")
+local volume_popup = volume_popup_mod:newVolumePopUp {
+    bg = Colors.surface,
+    border_color = Colors.sky,
+    icon_color = Colors.sky
+}
 
 naughty.config.presets.normal.timeout = 10
 naughty.config.presets.critical.timeout = 15
@@ -431,10 +437,18 @@ globalkeys = gears.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
         { description = "show the menubar", group = "launcher" }),
     awful.key({}, "XF86AudioRaiseVolume", function()
-        volume_widget.increase()
+        volume_widget.increase(
+            function(volume)
+                volume_popup:showPopUp(volume)
+            end
+        )
     end, { description = "increase volume", group = "media" }),
     awful.key({}, "XF86AudioLowerVolume", function()
-        volume_widget.decrease()
+        volume_widget.decrease(
+            function(volume)
+                volume_popup:showPopUp(volume)
+            end
+        )
     end, { description = "decrease volume", group = "media" }),
     awful.key({}, "XF86AudioMute", function()
         volume_widget.toggle_mute()
