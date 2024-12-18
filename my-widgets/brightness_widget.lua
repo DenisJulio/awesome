@@ -43,7 +43,7 @@ local brightness_widget = wibox.widget {
 }
 
 -- Update function
-local function update_brightness()
+local function update_brightness(callback)
     awful.spawn.easy_async_with_shell("brightnessctl get", function(stdout)
         local current = tonumber(stdout:match("%d+"))
         awful.spawn.easy_async_with_shell("brightnessctl max", function(max_stdout)
@@ -51,20 +51,21 @@ local function update_brightness()
             if current and max then
                 local percent = math.floor((current / max) * 100)
                 brightness_widget:get_children_by_id("text")[1].text = percent .. "%"
+                callback(percent)
             end
         end)
     end)
 end
 
 -- Functions to increase and decrease brightness
-local function increase_brightness()
+local function increase_brightness(callback)
     awful.spawn("brightnessctl set +5%", false)
-    update_brightness()
+    update_brightness(callback)
 end
 
-local function decrease_brightness()
+local function decrease_brightness(callback)
     awful.spawn("brightnessctl set 5%-", false)
-    update_brightness()
+    update_brightness(callback)
 end
 
 -- Expose the widget and functions

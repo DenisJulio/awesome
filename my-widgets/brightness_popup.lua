@@ -4,25 +4,28 @@ local gears = require("gears")
 local color = require("gears.color")
 local utils = require("my-widgets.utils")
 
---- @class VolumePopUpModule
---- @field VolumePopUp table
-local VolumePopUpModule = {}
+local M = {}
 
---- @class VolumePopUp
+local constants = {
+    brightness_bar_id = "brightness_bar",
+}
+
+
+--- @class BrightnessPopUp
 --- @field popup table the widget to be displayed
 --- @field timer? table
-local VolumePopUp = {}
+local BrightnessPopUp = {}
 
---- Configuration options for creating the volume popup
---- @class VolumePopUpConfig
+--- Configuration options for creating the brightness popup
+--- @class BrightnessPopUpConfig
 --- @field bg? string
 --- @field border_color? string
 --- @field icon_color? string
-local VolumePopUpConfig = {}
+local BrightnessPopUpConfig = {}
 
---- The volume icon widget in its containers widgets
+--- The brightness icon widget in its containers widgets
 --- @param image string the path to an image to be displayed as the icon
-local vol_icon = function(image)
+local brightness_icon = function(image)
     return wibox.widget {
         {
             {
@@ -41,11 +44,11 @@ local vol_icon = function(image)
     }
 end
 
---- The progress bar widget that displays the volume level
---- @param config VolumePopUpConfig
-local function volume_bar(config)
+--- The progress bar widget that displays the brightness level
+--- @param config BrightnessPopUpConfig
+local function brightness_bar(config)
     return {
-        id               = "volume_bar",
+        id               = constants.brightness_bar_id,
         max_value        = 100,
         value            = 50, -- Initial value
         forced_height    = 20,
@@ -58,16 +61,16 @@ local function volume_bar(config)
     }
 end
 
---- The volume popup widget
---- @param config VolumePopUpConfig
-local function create_volume_popup(config)
-    local image = utils.get_icon("audio-volume-high", 16)
+--- The brightness popup widget
+--- @param config BrightnessPopUpConfig
+local function create_brightness_popup(config)
+    local image = utils.get_icon("display-brightness-symbolic", 16)
     local colored_img = color.recolor_image(image, config.icon_color)
     return awful.popup {
         widget       = {
             {
-                vol_icon(colored_img),
-                volume_bar(config),
+                brightness_icon(colored_img),
+                brightness_bar(config),
                 id      = "container",
                 spacing = 10,
                 layout  = wibox.layout.fixed.horizontal,
@@ -87,23 +90,23 @@ local function create_volume_popup(config)
     }
 end
 
---- Creates a volume popup widget with the specified configuration
---- @param config VolumePopUpConfig
---- @return VolumePopUp
-function VolumePopUpModule:newVolumePopUp(config)
+--- Creates a bightness popup widget with the specified configuration
+--- @param config BrightnessPopUpConfig
+--- @return BrightnessPopUp
+function M:newBrightnessPopUp(config)
     local c = config or {}
     c.bg = c.bg or "#1E1E1E"
     c.border_color = c.border_color or "#4CAF50"
-    --- @type VolumePopUp
-    local volume_popup = {
-        popup = create_volume_popup(c),
+    --- @type BrightnessPopUp
+    local brightness_popup = {
+        popup = create_brightness_popup(c),
     }
-    return VolumePopUp:new(volume_popup)
+    return BrightnessPopUp:new(brightness_popup)
 end
 
---- Instantiates a new VolumePopUp
---- @param args VolumePopUp
-function VolumePopUp:new(args)
+--- Instantiates a new BrightnessPopUp
+--- @param args BrightnessPopUp
+function BrightnessPopUp:new(args)
     self.__index = self
     args.timer = gears.timer {
         timeout = 1,
@@ -116,15 +119,14 @@ function VolumePopUp:new(args)
     return setmetatable(args, self)
 end
 
--- Function to update and show the volume popup
-function VolumePopUp:showPopUp(volume)
+-- Function to update and show the brightness popup
+function BrightnessPopUp:showPopUp(brightness_lvl)
     -- Update the progress bar
-    self.popup.widget:get_children_by_id("volume_bar")[1].value = volume
+    self.popup.widget:get_children_by_id(constants.brightness_bar_id)[1].value = brightness_lvl
 
     -- Show the popup
     self.popup.visible = true
 
-    -- Hide it after 2 seconds
     if self.timer.started then
         self.timer:again()
     else
@@ -132,4 +134,4 @@ function VolumePopUp:showPopUp(volume)
     end
 end
 
-return VolumePopUpModule
+return M

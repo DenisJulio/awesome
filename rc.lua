@@ -25,11 +25,19 @@ local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
 local brightness_widget = require("my-widgets.brightness_widget")
 local Colors = require("utils.colors")
+
 local volume_popup_mod = require("my-widgets.volume_popup")
 local volume_popup = volume_popup_mod:newVolumePopUp {
     bg = Colors.surface,
     border_color = Colors.sky,
     icon_color = Colors.sky
+}
+
+local brightness_popup_mod = require("my-widgets.brightness_popup")
+local brightness_popup = brightness_popup_mod:newBrightnessPopUp {
+    bg = Colors.surface,
+    border_color = Colors.peach,
+    icon_color = Colors.peach
 }
 
 naughty.config.presets.normal.timeout = 10
@@ -469,11 +477,19 @@ globalkeys = gears.table.join(
         awful.spawn("copyq toggle")
     end, { description = "toggle copiq", group = "launcher" }),
     awful.key({}, "XF86MonBrightnessUp", function()
-        brightness_widget.increase_brightness()
+        brightness_widget.increase_brightness(
+            function(brightness)
+                brightness_popup:showPopUp(brightness)
+            end
+        )
     end, { description = "increase brightness", group = "custom" }),
 
     awful.key({}, "XF86MonBrightnessDown", function()
-        brightness_widget.decrease_brightness()
+        brightness_widget.decrease_brightness(
+            function(brightness)
+                brightness_popup:showPopUp(brightness)
+            end
+        )
     end, { description = "decrease brightness", group = "custom" })
 )
 

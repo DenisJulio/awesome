@@ -3,12 +3,14 @@
 --- @class Colors
 --- @field sky string
 --- @field red string
+--- @field peach string
 --- @field base string
 --- @field surface string
 --- @field crust string
 local Colors = {
     sky = "#89dceb",
     red = "#f38ba8",
+    peach = "#fab387",
     base = "#24273a",
     surface = "#1e1e2e",
     crust = "#11111b"
