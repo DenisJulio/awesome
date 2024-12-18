@@ -200,6 +200,9 @@ local rootAppsDir = "/usr/share/applications/"
 local appsDir = "/home/denisjulio/.local/share/applications/"
 local dekstopFilePaths = {
     appsDir .. "google-drive-pwa.desktop",
+    rootAppsDir .. "vlc.desktop",
+    rootAppsDir .. "kitty.desktop",
+    rootAppsDir .. "okularApplication_pdf.desktop",
     rootAppsDir .. "firefox.desktop",
     appsDir .. "excalidraw-pwa.desktop",
     rootAppsDir .. "obsidian.desktop",
