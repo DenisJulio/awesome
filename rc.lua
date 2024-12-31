@@ -21,10 +21,11 @@ require("awful.hotkeys_popup.keys")
 -----------------------------------------
 -- Custom Widgets
 -----------------------------------------
+local Colors = require("utils.colors")
 local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
 local brightness_widget = require("my-widgets.brightness_widget")
-local Colors = require("utils.colors")
+local tasklist_mod = require("my-widgets.tasklist")
 
 local volume_popup_mod = require("my-widgets.volume_popup")
 local volume_popup = volume_popup_mod:newVolumePopUp {
@@ -129,11 +130,14 @@ mymainmenu = awful.menu({
         { "open terminal", terminal }
     }
 })
+local clockFont = "Inter Display ExtraBold 10"
 
 local relogio = wibox.widget {
     widget = wibox.widget.textclock,
-    format = "%H:%M",
-    font = "Inter Black 12",
+    format = "   %H : %M",
+    valign = "center",
+    align = "center",
+    font = clockFont
 }
 
 -- Menubar configuration
@@ -145,12 +149,15 @@ mykeyboardlayout = awful.widget.keyboardlayout()
 
 -- {{{ Wibar
 -- Create a textclock widget
-mytextclock = wibox.widget {
-    wibox.widget.textclock("%d de %B, %A"),
-    top = 5,
-    bottom = 5,
-    widget = wibox.container.margin
+local mytextclock = wibox.widget {
+    widget = wibox.widget.textclock,
+    format = "   %A, %d de %B",
+    valign = "center",
+    align = "center",
+    font = clockFont,
 }
+
+
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -169,28 +176,6 @@ local taglist_buttons = gears.table.join(
     awful.button({}, 4, function(t) awful.tag.viewnext(t.screen) end),
     awful.button({}, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
-
-local tasklist_buttons = gears.table.join(
-    awful.button({}, 1, function(c)
-        if c == client.focus then
-            c.minimized = true
-        else
-            c:emit_signal(
-                "request::activate",
-                "tasklist",
-                { raise = true }
-            )
-        end
-    end),
-    awful.button({}, 3, function()
-        awful.menu.client_list({ theme = { width = 250 } })
-    end),
-    awful.button({}, 4, function()
-        awful.client.focus.byidx(1)
-    end),
-    awful.button({}, 5, function()
-        awful.client.focus.byidx(-1)
-    end))
 
 local function set_wallpaper(s)
     -- Wallpaper
@@ -247,30 +232,7 @@ awful.screen.connect_for_each_screen(function(s)
         buttons = taglist_buttons
     }
 
-
-
-    -- Create a tasklist widget
-    s.mytasklist = awful.widget.tasklist {
-        screen          = s,
-        filter          = awful.widget.tasklist.filter.currenttags,
-        layout          = {
-            spacing = 5, -- Adjust spacing between icons
-            layout = wibox.layout.fixed.horizontal,
-        },
-        widget_template = {
-            {
-                {
-                    id = "icon_role", -- Tasklist icon role
-                    widget = wibox.widget.imagebox,
-                },
-                margins = 5, -- Add margin around the icon
-                widget = wibox.container.margin,
-            },
-            id = "background_role", -- Use the background role for active/urgent tasks
-            widget = wibox.container.background,
-        },
-        buttons         = tasklist_buttons
-    }
+    s.tasklist = tasklist_mod.create_tasklist(s)
 
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s, height = 33, bg = "#00000000" })
@@ -294,7 +256,7 @@ awful.screen.connect_for_each_screen(function(s)
                 gears.shape.rounded_rect(cr, width, height, 10)
             end,
             {
-                layout = wibox.layout.align.horizontal,
+                layout = wibox.layout.flex.horizontal,
                 { -- Left widgets
                     layout = wibox.layout.fixed.horizontal,
                     {
@@ -306,34 +268,44 @@ awful.screen.connect_for_each_screen(function(s)
                         layout = wibox.container.margin
                     },
                     s.mypromptbox,
+                    s.tasklist
+                },
+                { -- Middle widget
+                    {
+                        relogio,
+                        mytextclock,
+                        layout = wibox.layout.fixed.horizontal,
+                        spacing = 12,
+                    },
+                    widget = wibox.container.place,
+                    halign = "center"
                 },
                 {
-                    s.mytasklist, -- Middle widget
-                    relogio,
-                    layout = wibox.layout.flex.horizontal,
-                },
-                { -- Right widgets
-                    layout = wibox.layout.fixed.horizontal,
-                    spacing = 7,
-                    mykeyboardlayout,
-                    {
-                        wibox.widget.systray(),
-                        top = 6,
-                        bottom = 6,
-                        layout = wibox.container.margin
+                    nil,
+                    nil,
+                    { -- Right widgets
+                        layout = wibox.layout.fixed.horizontal,
+                        spacing = 7,
+                        mykeyboardlayout,
+                        {
+                            wibox.widget.systray(),
+                            top = 6,
+                            bottom = 6,
+                            layout = wibox.container.margin
+                        },
+                        battery_widget,
+                        brightness_widget,
+                        volume_widget.widget,
+                        {
+                            s.mylayoutbox,
+                            left = 10,
+                            right = 10,
+                            top = 5,
+                            bottom = 5,
+                            layout = wibox.container.margin
+                        },
                     },
-                    battery_widget,
-                    brightness_widget,
-                    volume_widget.widget,
-                    mytextclock,
-                    {
-                        s.mylayoutbox,
-                        left = 10,
-                        right = 10,
-                        top = 5,
-                        bottom = 5,
-                        layout = wibox.container.margin
-                    },
+                    layout = wibox.layout.align.horizontal,
                 },
             },
         },
