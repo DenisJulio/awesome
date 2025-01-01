@@ -10,10 +10,10 @@ local constants = {
     brightness_bar_id = "brightness_bar",
 }
 
-
 --- @class BrightnessPopUp
 --- @field popup table the widget to be displayed
 --- @field timer? table
+--- @field text_widget table
 local BrightnessPopUp = {}
 
 --- Configuration options for creating the brightness popup
@@ -44,6 +44,14 @@ local brightness_icon = function(image)
     }
 end
 
+local brightness_icon_widget = wibox.widget {
+    widget = wibox.widget.textbox,
+    text = "󰃟 ",
+    align = "center",
+    valign = "center",
+    font = "Inter 12"
+}
+
 --- The progress bar widget that displays the brightness level
 --- @param config BrightnessPopUpConfig
 local function brightness_bar(config)
@@ -61,16 +69,34 @@ local function brightness_bar(config)
     }
 end
 
+local brightness_textbox = wibox.widget {
+    markup = "<b>0%</b>", -- Initial text: "0%",
+    widget = wibox.widget.textbox,
+    align = "center",
+    valign = "center",
+    font = "Inter Black 12"
+}
+
 --- The brightness popup widget
 --- @param config BrightnessPopUpConfig
-local function create_brightness_popup(config)
+local function create_brightness_popup(config, brightness_text_widget)
     local image = utils.get_icon("display-brightness-symbolic", 16)
     local colored_img = color.recolor_image(image, config.icon_color)
     return awful.popup {
         widget       = {
             {
-                brightness_icon(colored_img),
+                {
+                    brightness_icon_widget,
+                    layout = wibox.container.background,
+                    fg = config.border_color,
+                },
+                -- brightness_icon(colored_img),
                 brightness_bar(config),
+                {
+                    brightness_text_widget,
+                    layout = wibox.container.background,
+                    fg = config.border_color,
+                },
                 id      = "container",
                 spacing = 10,
                 layout  = wibox.layout.fixed.horizontal,
@@ -99,7 +125,8 @@ function M:newBrightnessPopUp(config)
     c.border_color = c.border_color or "#4CAF50"
     --- @type BrightnessPopUp
     local brightness_popup = {
-        popup = create_brightness_popup(c),
+        text_widget = brightness_textbox,
+        popup = create_brightness_popup(c, brightness_textbox)
     }
     return BrightnessPopUp:new(brightness_popup)
 end
@@ -123,6 +150,8 @@ end
 function BrightnessPopUp:showPopUp(brightness_lvl)
     -- Update the progress bar
     self.popup.widget:get_children_by_id(constants.brightness_bar_id)[1].value = brightness_lvl
+
+    self.text_widget.markup = "<b>" .. brightness_lvl .. "%</b>"
 
     -- Show the popup
     self.popup.visible = true

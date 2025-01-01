@@ -11,6 +11,7 @@ local VolumePopUpModule = {}
 --- @class VolumePopUp
 --- @field popup table the widget to be displayed
 --- @field timer? table
+--- @field textbox_widget table
 local VolumePopUp = {}
 
 --- Configuration options for creating the volume popup
@@ -58,9 +59,17 @@ local function volume_bar(config)
     }
 end
 
+local vol_textbox = wibox.widget {
+    markup = "<b>0%</b>", -- Initial text: "0%",
+    widget = wibox.widget.textbox,
+    align = "center",
+    valign = "center",
+    font = "Inter Black 12"
+}
+
 --- The volume popup widget
 --- @param config VolumePopUpConfig
-local function create_volume_popup(config)
+local function create_volume_popup(config, vol_text_widget)
     local image = utils.get_icon("audio-volume-high", 16)
     local colored_img = color.recolor_image(image, config.icon_color)
     return awful.popup {
@@ -68,6 +77,11 @@ local function create_volume_popup(config)
             {
                 vol_icon(colored_img),
                 volume_bar(config),
+                {
+                    vol_text_widget,
+                    layout = wibox.container.background,
+                    fg = config.border_color,
+                },
                 id      = "container",
                 spacing = 10,
                 layout  = wibox.layout.fixed.horizontal,
@@ -96,7 +110,8 @@ function VolumePopUpModule:newVolumePopUp(config)
     c.border_color = c.border_color or "#4CAF50"
     --- @type VolumePopUp
     local volume_popup = {
-        popup = create_volume_popup(c),
+        textbox_widget = vol_textbox,
+        popup = create_volume_popup(c, vol_textbox),
     }
     return VolumePopUp:new(volume_popup)
 end
@@ -120,6 +135,9 @@ end
 function VolumePopUp:showPopUp(volume)
     -- Update the progress bar
     self.popup.widget:get_children_by_id("volume_bar")[1].value = volume
+
+    -- Updata the text
+    self.textbox_widget.markup = string.format("<b>%d%%</b>", volume)
 
     -- Show the popup
     self.popup.visible = true
