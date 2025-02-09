@@ -95,7 +95,6 @@ modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
-    -- awful.layout.suit.floating,
     awful.layout.suit.max,
     awful.layout.suit.tile,
     -- awful.layout.suit.tile.left,
@@ -112,6 +111,7 @@ awful.layout.layouts = {
     -- awful.layout.suit.corner.ne,
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
+    awful.layout.suit.floating,
 }
 -- }}}
 
@@ -157,7 +157,17 @@ local mytextclock = wibox.widget {
     font = clockFont,
 }
 
+local calendar_popup = require("my-widgets.calendar_widget").newCalendarPopup(mytextclock)
 
+local myTextClock_button = awful.button {
+    modifiers = {},
+    button = awful.button.names.LEFT,
+    on_press = function()
+        calendar_popup:showCalendar()
+    end
+}
+
+mytextclock:add_button(myTextClock_button)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -177,17 +187,18 @@ local taglist_buttons = gears.table.join(
     awful.button({}, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
 
-local function set_wallpaper(s)
-    -- Wallpaper
-    if beautiful.wallpaper then
-        local wallpaper = beautiful.wallpaper
-        -- If wallpaper is a function, call it with the screen
-        if type(wallpaper) == "function" then
-            wallpaper = wallpaper(s)
-        end
-        gears.wallpaper.maximized(wallpaper, s, true)
-    end
-end
+-- local function set_wallpaper(s)
+--     -- Wallpaper
+--     if beautiful.wallpaper then
+--         local wallpaper = beautiful.wallpaper
+--         -- If wallpaper is a function, call it with the screen
+--         if type(wallpaper) == "function" then
+--             wallpaper = wallpaper(s)
+--         end
+--         gears.wallpaper.maximized(wallpaper, s, true)
+--     end
+-- end
+local set_wallpaper = require("utils.wallpapers").set_wallpaper
 
 local rootAppsDir = "/usr/share/applications/"
 local appsDir = "/home/denisjulio/.local/share/applications/"
@@ -714,6 +725,9 @@ end)
 
 -- App startup
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
+
+-- Download and set wallpaper
+awful.spawn.with_shell("~/.config/awesome/set_wallpaper.sh")
 
 ------------------------------------------
 -- Debugging
