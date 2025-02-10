@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Replace with your Unsplash API key
-API_KEY="ls7g4qUtBDMVmMZotn2J_K0djGCEE3MPi6sSDXt23BY"
-
 # Directory to store the wallpaper
 WALLPAPER_DIR="$HOME/Pictures/wallpapers"
 
@@ -13,7 +10,7 @@ IMAGE_PATH="$WALLPAPER_DIR/temp_wallpaper.jpg"
 
 # Fetch a random image from Unsplash with query parameters
 IMAGE_URL=$(curl -s -G "https://api.unsplash.com/photos/random" \
-                 --data-urlencode "client_id=$API_KEY" \
+                 --data-urlencode "client_id=$UNSPLASH_API_KEY" \
                  --data-urlencode "query=$QUERY" \
                  --data-urlencode "orientation=$ORIENTATION" | jq -r '.urls.full')
 
