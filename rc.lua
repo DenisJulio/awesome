@@ -163,7 +163,7 @@ local mytextclock = wibox.widget {
     font = clockFont,
 }
 
-local calendar_popup = require("my-widgets.calendar_widget").newCalendarPopup(mytextclock)
+local calendar_popup = require("my-widgets.calendar_widget.calendar_widget").newCalendarPopup(mytextclock)
 
 local myTextClock_button = awful.button {
     modifiers = {},
