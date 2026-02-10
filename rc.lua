@@ -727,7 +727,7 @@ end)
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
 
 -- Download and set wallpaper
-awful.spawn.with_shell("env $(cat ~/.unsplash_config | xargs) ~/.config/awesome/set_wallpaper.sh")
+-- awful.spawn.with_shell("~/.config/awesome/set_wallpaper.sh")
 
 ------------------------------------------
 -- Debugging
