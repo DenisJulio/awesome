@@ -18,4 +18,4 @@ IMAGE_URL=$(curl -s -G "https://api.unsplash.com/photos/random" \
 curl -o "$IMAGE_PATH" "$IMAGE_URL"
 
 # Set the wallpaper using feh
-feh --bg-fill "$IMAGE_PATH"
+feh --bg-scale "$IMAGE_PATH"

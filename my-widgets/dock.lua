@@ -155,7 +155,7 @@ local DockConfig = {}
 --- @param d DockConfig
 local function create_dock(d)
     return wibox {
-        width = awful.screen.focused().geometry.width,                                             -- Full screen width
+        width = awful.screen.focused().geometry.width,                                                   -- Full screen width
         height = d.height,                                                                               -- Dock height
         x = (awful.screen.focused().geometry.width - awful.screen.focused().geometry.width * 0.3) / 2,   -- Center horizontally
         y = awful.screen.focused().geometry.height - (d.height + d.bottom_space + (d.border_width * 2)), -- Position at the bottom
@@ -165,6 +165,9 @@ local function create_dock(d)
         visible = false,                                                                                 -- Initially hidden
         ontop = true,                                                                                    -- Always on top
         type = "dock",                                                                                   -- Dock type
+        shape = function(cr, width, height)
+            gears.shape.rounded_rect(cr, width, height, 10)                                              -- Configurable corner radius
+        end,
     }
 end
 

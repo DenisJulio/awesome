@@ -30,7 +30,7 @@ end
 
 function M.set_wallpaper(s)
     -- Define your wallpapers directory
-    local wallpaper_dir = "/home/denisjulio/Pictures/wallpapers"
+    local wallpaper_dir = "/home/denisjulio/Pictures/wallpapers/catppuccin"
     local wallpaper = get_random_wallpaper(wallpaper_dir)
 
     if wallpaper then

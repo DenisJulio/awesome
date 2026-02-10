@@ -22,6 +22,7 @@ require("awful.hotkeys_popup.keys")
 -- Custom Widgets
 -----------------------------------------
 local Colors = require("utils.colors")
+local Utils = require("utils.utils")
 local volume_widget = require("my-widgets.volume_widget")
 local battery_widget = require("my-widgets.battery_widget")
 local brightness_widget = require("my-widgets.brightness_widget")
@@ -85,6 +86,11 @@ beautiful.init("~/.config/awesome/default/theme.lua")
 terminal = "kitty"
 editor = os.getenv("EDITOR") or "nvim"
 editor_cmd = terminal .. " -e " .. editor
+
+-- Desables battery widget on desktop
+if Utils.is_on_desktop() then
+    battery_widget = nil
+end
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -208,6 +214,7 @@ local dekstopFilePaths = {
     rootAppsDir .. "kitty.desktop",
     rootAppsDir .. "okularApplication_pdf.desktop",
     rootAppsDir .. "firefox.desktop",
+    rootAppsDir .. "zen.desktop",
     appsDir .. "excalidraw-pwa.desktop",
     rootAppsDir .. "obsidian.desktop",
     rootAppsDir .. "thunar.desktop",
@@ -336,9 +343,9 @@ root.buttons(gears.table.join(
 globalkeys = gears.table.join(
     awful.key({ modkey, }, "s", hotkeys_popup.show_help,
         { description = "show help", group = "awesome" }),
-    awful.key({ modkey, }, "Left", awful.tag.viewprev,
+    awful.key({ modkey, }, "h", awful.tag.viewprev,
         { description = "view previous", group = "tag" }),
-    awful.key({ modkey, }, "Right", awful.tag.viewnext,
+    awful.key({ modkey, }, "l", awful.tag.viewnext,
         { description = "view next", group = "tag" }),
     awful.key({ modkey, }, "Escape", awful.tag.history.restore,
         { description = "go back", group = "tag" }),
@@ -386,9 +393,9 @@ globalkeys = gears.table.join(
             awful.spawn.with_shell("~/.config/rofi/powermenu/type-2/powermenu.sh")
         end,
         { description = "open power menu", group = "awesome" }),
-    awful.key({ modkey, }, "l", function() awful.tag.incmwfact(0.05) end,
+    awful.key({ modkey, }, "Right", function() awful.tag.incmwfact(0.05) end,
         { description = "increase master width factor", group = "layout" }),
-    awful.key({ modkey, }, "h", function() awful.tag.incmwfact(-0.05) end,
+    awful.key({ modkey, }, "Left", function() awful.tag.incmwfact(-0.05) end,
         { description = "decrease master width factor", group = "layout" }),
     awful.key({ modkey, "Shift" }, "h", function() awful.tag.incnmaster(1, nil, true) end,
         { description = "increase the number of master clients", group = "layout" }),
@@ -399,6 +406,8 @@ globalkeys = gears.table.join(
     awful.key({ modkey, "Control" }, "l", function() awful.tag.incncol(-1, nil, true) end,
         { description = "decrease the number of columns", group = "layout" }),
     awful.key({ modkey, }, "o", function() awful.layout.inc(1) end,
+        { description = "select next", group = "layout" }),
+    awful.key({ modkey, "Shift" }, "o", function() awful.layout.inc(-1) end,
         { description = "select next", group = "layout" }),
 
     awful.key({ modkey, "Control" }, "n",
@@ -447,9 +456,9 @@ globalkeys = gears.table.join(
     awful.key({}, "XF86AudioMute", function()
         volume_widget.toggle_mute()
     end, { description = "toggle mute", group = "media" }),
-    awful.key({ modkey }, "space", function()
-        awful.spawn.with_shell("~/.config/rofi/launchers/type-1/launcher.sh")
-    end, { description = "rofi", group = "launcher" }),
+    -- awful.key({ modkey }, "space", function()
+    --     awful.spawn.with_shell("~/.config/rofi/launchers/type-1/launcher.sh")
+    -- end, { description = "rofi", group = "launcher" }),
     awful.key({ modkey, "Shift" }, "f", function()
         awful.spawn("thunar")
     end, { description = "File manager", group = "launcher" }),
@@ -473,7 +482,10 @@ globalkeys = gears.table.join(
                 brightness_popup:showPopUp(brightness)
             end
         )
-    end, { description = "decrease brightness", group = "custom" })
+    end, { description = "decrease brightness", group = "custom" }),
+    awful.key({ modkey, "Shift" }, "w", function()
+        awful.spawn.with_shell("~/projects/rofi-wallpaper-switcher/launcher.sh")
+    end, { description = "wallpaper switcher", group = "launcher" })
 )
 
 clientkeys = gears.table.join(
@@ -603,6 +615,18 @@ awful.rules.rules = {
             placement = awful.placement.no_overlap + awful.placement.no_offscreen
         }
     },
+    -- Remove window border
+    {
+        rule_any = {
+            instance = {
+                "ulauncher",
+            },
+            class = {
+                "gnome-calculator"
+            }
+        },
+        properties = { border_width = 0 }
+    },
 
     -- Floating clients.
     {
@@ -611,6 +635,7 @@ awful.rules.rules = {
                 "DTA",   -- Firefox addon DownThemAll.
                 "copyq", -- Includes session name in class.
                 "pinentry",
+                "thunar"
             },
             class = {
                 "Arandr",
@@ -622,7 +647,10 @@ awful.rules.rules = {
                 "Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
                 "Wpa_gui",
                 "veromix",
-                "xtightvncviewer" },
+                "xtightvncviewer",
+                "gnome-calculator",
+                "thunar"
+            },
 
             -- Note that the name property shown in xprop might be set slightly after creation of the client
             -- and the name shown there might not match defined rules here.
@@ -653,7 +681,7 @@ awful.rules.rules = {
 
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
-client.connect_signal("manage", function(c)
+client.connect_signal("request::manage", function(c)
     -- Set the windows at the slave,
     -- i.e. put it at the end of others instead of setting it master.
     -- if not awesome.startup then awful.client.setslave(c) end
@@ -664,6 +692,28 @@ client.connect_signal("manage", function(c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
+
+    awful.spawn.easy_async_with_shell("sleep 0.1", function()
+        if c.valid then
+            if c.instance ~= nil then
+                local icon = menubar.utils.lookup_icon(c.instance)
+                local lower_icon = menubar.utils.lookup_icon(c.instance:lower())
+                if icon ~= nil then
+                    local new_icon = gears.surface(icon)
+                    c.icon = new_icon._native
+                elseif lower_icon ~= nil then
+                    local new_icon = gears.surface(lower_icon)
+                    c.icon = new_icon._native
+                elseif c.icon == nil then
+                    local new_icon = gears.surface(menubar.utils.lookup_icon("application-default-icon"))
+                    c.icon = new_icon._native
+                end
+            else
+                local new_icon = gears.surface(menubar.utils.lookup_icon("application-default-icon"))
+                c.icon = new_icon._native
+            end
+        end
+    end)
 end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.

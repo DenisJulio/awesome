@@ -1,6 +1,7 @@
 ---------------------------
 -- Default awesome theme --
 ---------------------------
+local gears = require("gears")
 
 --- Catppuccin colors
 local colors                                    = {
@@ -73,6 +74,7 @@ theme.notification_icon_size                    = 80
 theme.notification_bg                           = colors.surface
 theme.notification_border_width                 = 2
 theme.notification_border_color                 = colors.sky
+theme.notification_shape                        = gears.shape.rounded_rect
 
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]

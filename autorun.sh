@@ -15,3 +15,8 @@ run "copyq"
 run "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 run "syncthingtray"
 run "numlockx" on
+run "ulauncher" --hide-window
+
+# Disable screen blanking
+# TODO: Implement focus widget where screen blanking is going to be used when needed
+run "xset" -dpms s off
